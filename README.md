@@ -2,7 +2,6 @@
 
 [![CI](https://github.com/GRodolphe/py_plate/workflows/CI/badge.svg)](https://github.com/GRodolphe/py_plate/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/GRodolphe/py_plate/branch/main/graph/badge.svg)](https://codecov.io/gh/GRodolphe/py_plate)
-[![PyPI version](https://badge.fury.io/py/py_plate.svg)](https://badge.fury.io/py/py_plate)
 [![Code style: ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 <img src="img/py_plate.png" alt="py_plate" width="200">
