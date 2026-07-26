@@ -48,7 +48,7 @@ Please include the following information in your report:
 
 py_plate implements several security measures:
 
-- **Dependency Scanning**: Automated vulnerability scanning of dependencies using Safety and Trivy
+- **Dependency Scanning**: Automated vulnerability scanning of dependencies using Safety and OSV-Scanner
 - **Static Analysis**: Code security analysis using Bandit
 - **Secret Detection**: Automated detection of exposed secrets using detect-secrets
 - **Pre-commit Hooks**: Security checks run before each commit

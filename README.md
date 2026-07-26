@@ -14,7 +14,7 @@ A modern Python CLI template with best practices, featuring Typer, Ruff, pre-com
 - 🔧 **Development tools** with [Ruff](https://docs.astral.sh/ruff/) for linting and formatting
 - 🛡️ **Security** with pre-commit hooks and secret detection
 - 🧪 **Testing** with pytest and coverage reporting
-- 📦 **Easy installation** with pipx support
+- 📦 **Easy installation** with uv support
 - 🎯 **Type safety** with mypy
 - 📋 **Code quality** with comprehensive linting rules
 - 🚀 **CI/CD** with GitHub Actions for testing, linting, and releases
@@ -24,10 +24,10 @@ A modern Python CLI template with best practices, featuring Typer, Ruff, pre-com
 
 This template includes comprehensive security scanning tools that run automatically in CI/CD pipelines and can be used during development:
 
-- **[Trivy](https://trivy.dev/)** - Vulnerability scanner for filesystems, containers, and packages
+- **[OSV-Scanner](https://osv.dev/)** - Vulnerability scanner based on the OSV.dev database
   - Scans for known vulnerabilities in dependencies
-  - Generates detailed security reports in multiple formats
-  - Integrated into CI pipeline and release artifacts
+  - Uploads results to the GitHub Security tab via SARIF
+  - Integrated into CI pipeline and as a release gate
 
 - **[Bandit](https://bandit.readthedocs.io/)** - Security linter for Python code
   - Identifies common security issues in Python code
@@ -46,35 +46,37 @@ This template includes comprehensive security scanning tools that run automatica
 
 All security tools generate JSON reports that are included as artifacts in GitHub releases, providing transparency and audit trails for security compliance.
 
-## 🚀 Quick Start with pipx
+## 🚀 Quick Start with uv
 
-[pipx](https://pypa.github.io/pipx/) is the recommended way to install Python CLI applications. It installs packages in isolated environments while making their entry points available globally.
+[uv](https://docs.astral.sh/uv/) is the recommended way to install Python CLI applications. Its `uv tool` command installs packages in isolated environments while making their entry points available globally.
 
-### Install pipx (if not already installed)
+### Install uv (if not already installed)
 
 ```bash
-# On macOS
-brew install pipx
+# On macOS and Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# On Ubuntu/Debian
-sudo apt update && sudo apt install pipx
+# On macOS with Homebrew
+brew install uv
 
-# On other systems with pip
-python3 -m pip install --user pipx
-python3 -m pipx ensurepath
+# On Windows
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# With pip
+pip install uv
 ```
 
 ### Install the CLI
 
 ```bash
 # Install from PyPI (when published)
-pipx install py-plate-template
+uv tool install py-plate-template
 
 # Or install from local directory
-pipx install .
+uv tool install .
 
 # Or install in development mode
-pipx install --editable .
+uv tool install --editable .
 ```
 
 ### Usage
@@ -105,7 +107,7 @@ py-plate config --set debug true
 ### Prerequisites
 
 - Python 3.9 or higher
-- pip or pipx
+- uv (recommended) or pip
 
 ### Development Installation
 
@@ -117,8 +119,10 @@ cd py_plate
 # Install in development mode with all dependencies
 pip install -e ".[dev]"
 
-# Or use pipx for isolated development
-pipx install --editable ".[dev]"
+# Or use uv for isolated development
+uv venv
+source .venv/bin/activate
+uv pip install -e ".[dev]"
 ```
 
 ### Set up pre-commit hooks
