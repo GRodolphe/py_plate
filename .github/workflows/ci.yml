@@ -75,28 +75,6 @@ jobs:
         pip install -e ".[dev]"
         pip install safety detect-secrets bandit
 
-    - name: Run Trivy filesystem scan
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: '.'
-        format: 'table'
-
-    - name: Run Trivy filesystem scan (JSON report)
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: '.'
-        format: 'json'
-        output: 'trivy-fs-results.json'
-
-    - name: Upload Trivy filesystem results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: trivy-fs-results
-        path: trivy-fs-results.json
-
     - name: Run bandit security linter
       run: |
         bandit -r src/ -c pyproject.toml
@@ -109,10 +87,18 @@ jobs:
       run: |
         detect-secrets scan --baseline .secrets.baseline
 
+  osv-scan:
+    name: OSV-Scanner Vulnerability Scan
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.3.8
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
   build:
     name: Build Package
     runs-on: ubuntu-latest
-    needs: [test, security]
+    needs: [test, security, osv-scan]
 
     steps:
     - uses: actions/checkout@v4
@@ -131,70 +117,9 @@ jobs:
       run: |
         python -m build
 
-    - name: Run Trivy scan on built package
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: 'dist/'
-        format: 'table'
-
-    - name: Run Trivy scan on built package (JSON report)
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: 'dist/'
-        format: 'json'
-        output: 'trivy-package-results.json'
-
-    - name: Upload Trivy package results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: trivy-package-results
-        path: trivy-package-results.json
-
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: dist
         path: dist/
 
-  # Container security scan job - uncomment when you add Docker support
-  # container-security:
-  #   name: Container Security Scan
-  #   runs-on: ubuntu-latest
-  #   needs: [build]
-  #
-  #   steps:
-  #   - uses: actions/checkout@v4
-  #
-  #   - name: Build Docker image
-  #     run: |
-  #       docker build -t py_plate:latest .
-  #
-  #   - name: Run Trivy container scan
-  #     uses: aquasecurity/trivy-action@master
-  #     with:
-  #       image-ref: 'py_plate:latest'
-  #       format: 'sarif'
-  #       output: 'trivy-container-results.sarif'
-  #
-  #   - name: Upload Trivy container scan results to GitHub Security tab
-  #     uses: github/codeql-action/upload-sarif@v3
-  #     if: always()
-  #     with:
-  #       sarif_file: 'trivy-container-results.sarif'
-  #
-  #   - name: Run Trivy container scan (JSON report)
-  #     uses: aquasecurity/trivy-action@master
-  #     with:
-  #       image-ref: 'py_plate:latest'
-  #       format: 'json'
-  #       output: 'trivy-container-results.json'
-  #
-  #   - name: Upload Trivy container results
-  #     uses: actions/upload-artifact@v4
-  #     if: always()
-  #     with:
-  #       name: trivy-container-results
-  #       path: trivy-container-results.json

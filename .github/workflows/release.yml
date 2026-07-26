@@ -36,10 +36,18 @@ jobs:
         ruff format --check
         mypy src/
 
+  osv-scan:
+    name: OSV-Scanner Vulnerability Scan
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.3.8
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
   build:
     name: Build and publish
     runs-on: ubuntu-latest
-    needs: test
+    needs: [test, osv-scan]
     environment:
       name: release
       url: https://pypi.org/p/py_plate
@@ -69,22 +77,6 @@ jobs:
       run: |
         pip install safety bandit detect-secrets
 
-    - name: Run Trivy filesystem scan
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: '.'
-        format: 'json'
-        output: 'trivy-fs-results.json'
-
-    - name: Run Trivy package scan
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: 'dist/'
-        format: 'json'
-        output: 'trivy-package-results.json'
-
     - name: Run bandit security scan
       run: |
         bandit -r src/ -f json -o bandit-results.json || true
@@ -110,8 +102,6 @@ jobs:
           --draft=false \
           --prerelease=false \
           dist/* \
-          trivy-fs-results.json \
-          trivy-package-results.json \
           bandit-results.json \
           safety-results.json \
           secrets-scan-results.json
